@@ -310,7 +310,7 @@ Esta aplicación está desplegada en **Netlify**.
 
 ### 🌐 Sitio en Producción
 
-**URL:** <!-- Agregar link de Netlify aquí -->
+**URL:** [(https://libreria-digital.netlify.app/)]
 
 ---
 
