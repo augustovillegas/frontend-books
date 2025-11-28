@@ -3,6 +3,8 @@ import Button from '../components/ui/Button.jsx'
 import PageSection from '../components/ui/PageSection.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
+import usePagination from '../hooks/usePagination.js'
+import Pagination from '../components/ui/Pagination.jsx'
 
 export default function BooksListPage() {
   const { books, loading, error } = useBooks()
@@ -31,27 +33,40 @@ export default function BooksListPage() {
     )
   }
 
+  const pagination = usePagination(books, 5, 3)
+
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-8">
       <PageSection>
-      <header className="flex flex-wrap items-center gap-3 justify-between">
-        <h1 className="text-2xl font-semibold m-0">Mis libros</h1>
-        <Button to="/books/create" className="whitespace-nowrap">
-          + Nuevo libro
-        </Button>
-      </header>
+        <header className="flex flex-wrap items-center gap-3 justify-between">
+          <h1 className="text-2xl font-semibold m-0">Mis libros</h1>
+          <Button to="/books/create" className="whitespace-nowrap">
+            + Nuevo libro
+          </Button>
+        </header>
 
-      {books.length === 0 ? (
-        <p className="text-sm text-neutral-600">
-          Todavia no cargaste libros. Empeza creando uno nuevo.
-        </p>
-      ) : (
-        <div className="grid gap-5 sm:gap-6 xl:gap-7 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] justify-center">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </div>
-      )}
+        {books.length === 0 ? (
+          <p className="text-sm text-neutral-600">
+            Todavia no cargaste libros. Empeza creando uno nuevo.
+          </p>
+        ) : (
+          <>
+            <div className="grid gap-5 sm:gap-6 xl:gap-7 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] justify-center">
+              {pagination.paginatedItems.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              setPage={pagination.setPage}
+              nextPage={pagination.nextPage}
+              prevPage={pagination.prevPage}
+              firstPage={pagination.firstPage}
+              lastPage={pagination.lastPage}
+            />
+          </>
+        )}
       </PageSection>
     </div>
   )

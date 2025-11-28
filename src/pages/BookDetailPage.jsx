@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import useModal from '../hooks/useModal.js'
+import Modal from '../components/ui/Modal.jsx'
 import { useNavigate, useParams } from 'react-router-dom'
 import Button from '../components/ui/Button.jsx'
 import Card from '../components/ui/Card.jsx'
@@ -11,6 +13,8 @@ export default function BookDetailPage() {
   const navigate = useNavigate()
   const { getBookById } = useBooks()
   const [book, setBook] = useState(null)
+  // Modal hook debe ir aquí
+  const { open, openModal, closeModal } = useModal()
 
   useEffect(() => {
     async function load() {
@@ -65,12 +69,28 @@ export default function BookDetailPage() {
         </dl>
 
         {book.coverUrl ? (
-          <img
-            src={book.coverUrl}
-            alt={book.title}
-            className="w-full max-h-80 object-cover border border-black/10 rounded-lg"
-          />
+          <>
+            <img
+              src={book.coverUrl}
+              alt={book.title}
+              className="w-full max-h-80 object-cover border border-black/10 rounded-lg cursor-zoom-in transition hover:shadow-lg"
+              onClick={openModal}
+              title="Ver imagen completa"
+            />
+            <span className="block text-center text-xs text-neutral-500 mt-1 select-none">
+              <svg className="inline align-middle mr-1" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
+              Click en la imagen para ampliar
+            </span>
+            <Modal open={open} onClose={closeModal}>
+              <img
+                src={book.coverUrl}
+                alt={book.title}
+                className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg bg-neutral-100"
+              />
+            </Modal>
+          </>
         ) : null}
+
 
         <div className="flex gap-2 pt-2">
           <Button onClick={() => navigate(-1)} variant="secondary" fullWidth>

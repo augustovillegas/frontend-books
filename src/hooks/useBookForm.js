@@ -1,3 +1,10 @@
+// Normaliza a mayúsculas y colapsa espacios
+const normalizeUpper = (raw) => {
+  return raw
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 
@@ -10,14 +17,14 @@ export const defaultBook = {
   coverUrl: '',
 }
 
+// Permite escribir libremente, solo normaliza al perder foco
 const normalizeAuthor = (raw) => {
   return raw
     .toUpperCase()
-    .trim()
-    .replace(/\s+/g, ' ') 
-    .replace(/,\s*/g, ', ') 
-    .replace(/,{2,}/g, ',') 
+    .replace(/\s+/g, ' ')
+    .replace(/,{2,}/g, ',')
     .replace(/^,|,$/g, '')
+    .trim()
 }
 
 const validateField = (name, value) => {
@@ -31,7 +38,7 @@ const validateField = (name, value) => {
     case 'author':
       const normalized = normalizeAuthor(value)
       if (!normalized) return 'El autor es obligatorio'      
-      if (!/^[A-ZÁÉÍÓÚÜÑ ,.'\-]+$/.test(normalized)) return 'Solo letras, espacios, comas y puntuación básica (.\'-)' 
+      if (!/^[A-ZÁÉÍÓÚÜÑ .,'\-]+$/.test(normalized)) return 'Solo letras, espacios, comas y puntuación básica (.\'-)'
       if (normalized.length < 3) return 'El autor debe tener al menos 3 caracteres'
       if (normalized.length > 120) return 'El autor no puede exceder 120 caracteres'
       const parts = normalized.split(',').map(p => p.trim()).filter(p => p)
@@ -75,10 +82,10 @@ export function useBookForm({ initialValues = defaultBook, onSubmit }) {
 
   const handleChange = (event) => {
     const { name, value } = event.target
-   
-    const nextValue = name === 'author' ? normalizeAuthor(value) : value
+    let nextValue = value
+    if (name === 'author') nextValue = normalizeAuthor(value)
+    else if (name === 'title') nextValue = normalizeUpper(value)
     setValues((prev) => ({ ...prev, [name]: nextValue }))
-    
     if (touched[name]) {
       const error = validateField(name, nextValue)
       setErrors((prev) => ({ ...prev, [name]: error }))
@@ -88,7 +95,9 @@ export function useBookForm({ initialValues = defaultBook, onSubmit }) {
   const handleBlur = (event) => {
     const { name, value } = event.target
     setTouched((prev) => ({ ...prev, [name]: true }))
-    const finalValue = name === 'author' ? normalizeAuthor(value) : value
+    let finalValue = value
+    if (name === 'author') finalValue = normalizeAuthor(value)
+    else if (name === 'title') finalValue = normalizeUpper(value)
     if (finalValue !== values[name]) {
       setValues((prev) => ({ ...prev, [name]: finalValue }))
     }
