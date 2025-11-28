@@ -30,7 +30,11 @@ export default function HomePage() {
                 Crea, edita, organiza y lleva el control de tus lecturas.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button to="/books" size="lg" className="shadow-lg">
+                <Button
+                  to="/books"
+                  size="lg"
+                  className="shadow-lg hover:shadow-[0_6px_32px_0_rgba(255,255,255,0.45)] ring-2 ring-white/70 hover:scale-102 transition-all duration-300 border-2 border-white"
+                >
                   Ver mis libros
                 </Button>
                 <Button to="/books/create" variant="soft" size="lg" className="shadow-lg bg-white hover:bg-neutral-100">

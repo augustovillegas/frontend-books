@@ -14,7 +14,7 @@ export default function Button({
   ...props
 }) {
   const base =
-    'inline-flex items-center justify-center font-semibold rounded-lg border transition-all duration-200 no-underline disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white active:translate-y-px'
+    'inline-flex items-center justify-center font-semibold rounded-lg border transition-all duration-200 no-underline disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white'
   const sizes = {
     sm: 'text-xs min-h-[36px] px-3 py-1.5',
     md: 'text-sm min-h-[44px] px-3.5 py-2.5',
@@ -22,13 +22,13 @@ export default function Button({
   }
   const variants = {
     primary:
-      'bg-black text-white border-black hover:shadow-md hover:-translate-y-0.5 focus-visible:shadow-lg',
+      'bg-black text-white border-black hover:shadow-[0_4px_32px_0_rgba(255,255,255,0.25)]',
     secondary:
-      'bg-white text-black border-black/20 font-medium hover:bg-black hover:text-white hover:shadow-md hover:-translate-y-0.5',
+      'bg-white text-black border-black/20 font-medium hover:bg-black hover:text-white hover:shadow-[0_4px_32px_0_rgba(255,255,255,0.18)]',
     soft:
-      'bg-neutral-100 text-black border-neutral-200 hover:bg-neutral-200 hover:shadow-sm',
+      'bg-neutral-100 text-black border-neutral-200 hover:bg-neutral-200 hover:shadow-[0_2px_16px_0_rgba(255,255,255,0.12)]',
     destructive:
-      'bg-red-600 text-white border-red-600 hover:bg-red-700 hover:shadow-md hover:-translate-y-0.5 focus-visible:shadow-lg',
+      'bg-red-600 text-white border-red-600 hover:bg-red-700 hover:shadow-[0_4px_32px_0_rgba(255,255,255,0.25)]',
   }
   const width = fullWidth ? 'w-full' : ''
   const sizeClasses = sizes[size] || sizes.md

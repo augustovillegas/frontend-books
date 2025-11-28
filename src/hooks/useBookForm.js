@@ -1,9 +1,7 @@
 // Normaliza a mayúsculas y colapsa espacios
+// No forzar mayúsculas en tiempo real, solo limpiar espacios
 const normalizeUpper = (raw) => {
-  return raw
-    .toUpperCase()
-    .replace(/\s+/g, ' ')
-    .trim()
+  return raw.replace(/\s+/g, ' ').trim()
 }
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -18,34 +16,39 @@ export const defaultBook = {
 }
 
 // Permite escribir libremente, solo normaliza al perder foco
+// No forzar mayúsculas en tiempo real, solo limpiar espacios y comas
 const normalizeAuthor = (raw) => {
   return raw
-    .toUpperCase()
     .replace(/\s+/g, ' ')
     .replace(/,{2,}/g, ',')
     .replace(/^,|,$/g, '')
     .trim()
 }
 
+const AUTHOR_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ .,'\-]+$/;
+const TITLE_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9 .,'\-]+$/;
 const validateField = (name, value) => {
   switch (name) {
-    case 'title':
-      if (!value.trim()) return 'El título es obligatorio'
-      if (value.trim().length < 2) return 'El título debe tener al menos 2 caracteres'
-      if (value.trim().length > 200) return 'El título no puede exceder 200 caracteres'
+    case 'title': {
+      const val = value.trim()
+      if (!val) return 'El título es obligatorio'
+      if (val.length < 2) return 'El título debe tener al menos 2 caracteres'
+      if (val.length > 200) return 'El título no puede exceder 200 caracteres'
+      if (!TITLE_REGEX.test(val)) return 'Solo letras, números, espacios y puntuación básica (.,\'-)'
       return ''
-    
-    case 'author':
-      const normalized = normalizeAuthor(value)
-      if (!normalized) return 'El autor es obligatorio'      
-      if (!/^[A-ZÁÉÍÓÚÜÑ .,'\-]+$/.test(normalized)) return 'Solo letras, espacios, comas y puntuación básica (.\'-)'
-      if (normalized.length < 3) return 'El autor debe tener al menos 3 caracteres'
-      if (normalized.length > 120) return 'El autor no puede exceder 120 caracteres'
-      const parts = normalized.split(',').map(p => p.trim()).filter(p => p)
+    }
+    case 'author': {
+      const val = value.trim()
+      if (!val) return 'El autor es obligatorio'
+      if (val.length < 2) return 'El autor debe tener al menos 2 caracteres'
+      if (val.length > 120) return 'El autor no puede exceder 120 caracteres'
+      if (!AUTHOR_REGEX.test(val)) return 'Solo letras, espacios, tildes, comas, puntos, guiones y apóstrofes'
+      const parts = val.split(',').map(p => p.trim()).filter(p => p)
       if (parts.length === 0) return 'Debes ingresar al menos un autor'
       if (parts.some(p => p.length < 2)) return 'Cada autor debe tener al menos 2 caracteres'
       if (parts.length > 10) return 'Máximo 10 autores'
       return ''
+    }
     
     case 'genre':
       if (!value.trim()) return 'El género es obligatorio'
@@ -80,18 +83,17 @@ export function useBookForm({ initialValues = defaultBook, onSubmit }) {
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
 
+  // Permitir escribir libremente, solo limpiar espacios
   const handleChange = (event) => {
     const { name, value } = event.target
-    let nextValue = value
-    if (name === 'author') nextValue = normalizeAuthor(value)
-    else if (name === 'title') nextValue = normalizeUpper(value)
-    setValues((prev) => ({ ...prev, [name]: nextValue }))
+    setValues((prev) => ({ ...prev, [name]: value }))
     if (touched[name]) {
-      const error = validateField(name, nextValue)
+      const error = validateField(name, value)
       setErrors((prev) => ({ ...prev, [name]: error }))
     }
   }
 
+  // Limpiar espacios y normalizar solo al salir del campo
   const handleBlur = (event) => {
     const { name, value } = event.target
     setTouched((prev) => ({ ...prev, [name]: true }))
@@ -107,7 +109,6 @@ export function useBookForm({ initialValues = defaultBook, onSubmit }) {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    
     const newErrors = {}
     Object.keys(values).forEach((key) => {
       const error = validateField(key, values[key])
@@ -122,7 +123,13 @@ export function useBookForm({ initialValues = defaultBook, onSubmit }) {
       return
     }
 
-    onSubmit(values)
+    // Guardar Título y Autor en mayúsculas
+    const toSave = {
+      ...values,
+      title: values.title ? values.title.toUpperCase() : '',
+      author: values.author ? values.author.toUpperCase() : '',
+    }
+    onSubmit(toSave)
   }
 
   return { values, errors, touched, handleChange, handleBlur, handleSubmit }
